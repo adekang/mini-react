@@ -1,6 +1,7 @@
 import { Props, Key, Ref } from 'shared/ReactTypes';
 import { WorkTag } from './workTags';
 import { Flags, NoFlags } from './fiberFlags';
+import { Container } from 'hostConfig';
 
 export class FiberNode {
 	type: any;
@@ -16,8 +17,17 @@ export class FiberNode {
 	return: FiberNode | null;
 
 	memoizedProps: Props | null;
+	memoizedState: any;
 	alternate: FiberNode | null;
 	flags: Flags;
+
+	updateQueue: unknown;
+	/**
+	 *
+	 * @param tag 标签
+	 * @param pendingProps 待更新的props
+	 * @param key key
+	 */
 	constructor(tag: WorkTag, pendingProps: Props, key: Key) {
 		// 实例
 		this.tag = tag;
@@ -44,6 +54,8 @@ export class FiberNode {
 		this.pendingProps = pendingProps;
 		// 工作完后确定下来的props是什么
 		this.memoizedProps = null;
+		this.memoizedState = null;
+		this.updateQueue = null;
 
 		// 在fiberNode 与 对应 fiberNode 切换
 		this.alternate = null;
@@ -51,3 +63,53 @@ export class FiberNode {
 		this.flags = NoFlags;
 	}
 }
+
+/**
+ * FiberRootNode
+ */
+export class FiberRootNode {
+	container: Container;
+	current: FiberNode;
+	finishedWork: FiberNode | null; // 最终更新完成以后的fiber树
+	/**
+	 * @param container  容器
+	 * @param hostRootFiber DOM根节点
+	 */
+	constructor(container: Container, hostRootFiber: FiberNode) {
+		this.container = container;
+		this.current = hostRootFiber;
+		hostRootFiber.stateNode = this;
+		this.finishedWork = null;
+	}
+}
+
+/**
+ * 创建一个新的fiberNode
+ * @param current 当前工作的fiberNode
+ * @param pendingProps 刚开始工作的props
+ * @returns 返回一个新的fiberNode
+ */
+export const createWorkInProgress = (
+	current: FiberNode,
+	pendingProps: Props
+): FiberNode => {
+	let wip = current.alternate;
+	if (wip == null) {
+		// 首次加载
+		wip = new FiberNode(current.tag, pendingProps, current.key);
+		wip.type = current.type;
+		wip.stateNode = current.stateNode;
+
+		wip.alternate = current;
+		current.alternate = wip;
+	} else {
+		// 更新
+		wip.pendingProps = pendingProps;
+		wip.flags = NoFlags;
+	}
+	wip.type = current.type;
+	wip.updateQueue = current.updateQueue; // 共用同一个 updateQueue对象
+	wip.child = current.child;
+	wip.memoizedState = current.memoizedState;
+	return wip;
+};
