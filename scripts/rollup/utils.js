@@ -5,6 +5,7 @@ import cjs from '@rollup/plugin-commonjs';
 
 const pakPath = path.resolve(__dirname, '../../packages');
 const distPath = path.resolve(__dirname, '../../dist/node_modules');
+import replace from '@rollup/plugin-replace';
 
 /**
  * 获取包的路径
@@ -37,6 +38,11 @@ export function getPackageJSON(pkgName) {
  * @param {*} typescript typescript的配置
  * @returns
  */
-export function getBaseRollupPlugins({ typescript = {} } = {}) {
-	return [cjs(), ts(typescript)];
+export function getBaseRollupPlugins({
+	alias = {
+		__DEV__: true
+	},
+	typescript = {}
+} = {}) {
+	return [replace(alias), cjs(), ts(typescript)];
 }

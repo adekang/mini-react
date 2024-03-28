@@ -45,12 +45,38 @@ function renderRoot(root: FiberRootNode) {
 			workLoop();
 			break;
 		} catch (e) {
-			console.error('workLoop发生错误', e);
+			if (__DEV__) {
+				console.error('workLoop发生错误', e);
+			}
 			wip = null;
 		}
 	} while (true);
+
+	const finishedWork = root.current.alternate;
+	root.finishedWork = finishedWork;
+	// 这里已经生成了wip fiberNode树 树中带有 flags
+	commitRoot(root);
 }
 
+/**
+ * commit阶段的入口
+ * @param root
+ */
+function commitRoot(root: FiberRootNode) {
+	const finishedWork = root.finishedWork;
+	if (finishedWork === null) {
+		return;
+	}
+
+	if (__DEV__) {
+		console.warn('commit阶段开始', finishedWork);
+	}
+	root.finishedWork = null;
+}
+
+/**
+ * render阶段的入口
+ */
 function workLoop() {
 	while (wip !== null) {
 		preformUnitOfWork(wip);
@@ -73,7 +99,7 @@ function preformUnitOfWork(fiber: FiberNode) {
  * @param fiber
  */
 function completeUnitOfWork(fiber: FiberNode) {
-	const node: FiberNode | null = fiber;
+	let node: FiberNode | null = fiber;
 
 	do {
 		completeWork(node);

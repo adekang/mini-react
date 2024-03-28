@@ -28,12 +28,12 @@ export const createUpdate = <State>(action: Action<State>): Update<State> => {
  * 创建一个更新队列
  * @returns  返回一个更新队列
  */
-export const createUpdateQueue = <Action>() => {
+export const createUpdateQueue = <State>() => {
 	return {
 		shared: {
 			pending: null
 		}
-	} as UpdateQueue<Action>;
+	} as UpdateQueue<State>;
 };
 
 /**
@@ -41,15 +41,15 @@ export const createUpdateQueue = <Action>() => {
  * @param updateQueue 要更新的队列
  * @param update 更新值
  */
-export const enqueueUpdate = <Action>(
-	updateQueue: UpdateQueue<Action>,
-	update: Update<Action>
+export const enqueueUpdate = <State>(
+	updateQueue: UpdateQueue<State>,
+	update: Update<State>
 ) => {
 	updateQueue.shared.pending = update;
 };
 
 /**
- * UpdateQueue消费update
+ * UpdateQueue消费update  计算状态的最新值
  * @param baseState 初始状态
  * @param pendingUpdate 待消费的update
  * @return 返回一个新的状态 memoizedState
