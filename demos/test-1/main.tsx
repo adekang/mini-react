@@ -1,12 +1,15 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 
 const jsx = (
 	<div>
-		<span>hello my-react</span>
+		<span>hello react</span>
 	</div>
 );
 
-console.log(jsx);
-// root.render(<App />);
+const root = document.getElementById('root');
+ReactDOM.createRoot(root).render(jsx);
 
-// window.root = root;
+console.log(React);
+console.log(jsx);
+console.log(ReactDOM);
