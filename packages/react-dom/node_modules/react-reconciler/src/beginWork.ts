@@ -5,8 +5,14 @@
 import { ReactElementType } from 'shared/ReactTypes';
 import { mountChildFibers, reconcileChildFibers } from './childFibers';
 import { FiberNode } from './fiber';
+import { renderWithHooks } from './fiberHooks';
 import { processUpdateQueue, UpdateQueue } from './updateQueue';
-import { HostComponent, HostRoot, HostText } from './workTags';
+import {
+	FunctionComponent,
+	HostComponent,
+	HostRoot,
+	HostText
+} from './workTags';
 
 export function beginWork(wip: FiberNode) {
 	// 比较 返回子fiberNode
@@ -17,7 +23,8 @@ export function beginWork(wip: FiberNode) {
 			return updateHostComponent(wip);
 		case HostText:
 			return null;
-
+		case FunctionComponent:
+			return updateFunctionComponent(wip);
 		default:
 			if (__DEV__) {
 				console.warn('beginWork: 未知的tag类型');
@@ -25,6 +32,18 @@ export function beginWork(wip: FiberNode) {
 			break;
 	}
 	return null;
+}
+
+/**
+ * 更新FunctionComponent
+ * @param wip
+ */
+function updateFunctionComponent(wip: FiberNode) {
+	const nextChildren = renderWithHooks(wip);
+
+	reconcileChildren(wip, nextChildren);
+
+	return wip.child;
 }
 
 /**

@@ -6,12 +6,19 @@ import {
 } from 'hostConfig';
 import { FiberNode } from './fiber';
 import { NoFlags } from './fiberFlags';
-import { HostComponent, HostRoot, HostText } from './workTags';
+import {
+	FunctionComponent,
+	HostComponent,
+	HostRoot,
+	HostText
+} from './workTags';
 
 /**
  * 递归中的归阶段
  */
 export function completeWork(wip: FiberNode) {
+	console.log('completeWork', wip);
+
 	const newProps = wip.pendingProps;
 	const current = wip.alternate;
 
@@ -45,6 +52,10 @@ export function completeWork(wip: FiberNode) {
 				// 2.将DOM插入到DOM树中
 				wip.stateNode = instance;
 			}
+			bubbleProperties(wip);
+			return null;
+		case FunctionComponent:
+			// 无需处理
 			bubbleProperties(wip);
 			return null;
 		default:
