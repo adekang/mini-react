@@ -23,6 +23,9 @@ export function scheduleUpdateOnFiber(fiber: FiberNode) {
 	renderRoot(root);
 }
 
+/**
+ * 从fiber链表中找到顶层节点 fiberRootNode
+ */
 function markUpdateFromFiberToRoot(fiber: FiberNode) {
 	let node = fiber;
 	let parent = node.return;
@@ -40,6 +43,7 @@ function markUpdateFromFiberToRoot(fiber: FiberNode) {
 }
 function renderRoot(root: FiberRootNode) {
 	// 初始化
+	// 初始化wip
 	prepareFreshStack(root);
 
 	do {

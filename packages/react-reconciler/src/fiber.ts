@@ -74,8 +74,8 @@ export class FiberRootNode {
 	current: FiberNode;
 	finishedWork: FiberNode | null; // 最终更新完成以后的fiber树
 	/**
-	 * @param container  容器
-	 * @param hostRootFiber DOM根节点
+	 * @param container  容器 div#root
+	 * @param hostRootFiber React的根节点
 	 */
 	constructor(container: Container, hostRootFiber: FiberNode) {
 		this.container = container;

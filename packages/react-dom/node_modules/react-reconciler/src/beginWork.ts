@@ -78,6 +78,11 @@ function updateHostComponent(wip: FiberNode) {
 	return wip.child;
 }
 
+/**
+ * 构建 fiber树的过程
+ * @param wip workInProgress
+ * @param children element对象
+ */
 function reconcileChildren(wip: FiberNode, children?: ReactElementType) {
 	// 获取父节点的currentNode
 	const current = wip.alternate;

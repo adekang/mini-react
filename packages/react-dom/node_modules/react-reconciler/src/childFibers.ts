@@ -15,10 +15,13 @@ function childReconciler(shouldTrackSideEffects: boolean) {
 		element: ReactElementType
 	) {
 		// 根据element创建fiber
+		// 在这里给子节点挂在return 和 父fiber进行关联的
 		const fiber = createFiberFromElement(element);
 		fiber.return = returnFiber;
+		// 返回的是新子元素创建的fiber对象
 		return fiber;
 	}
+
 	function reconcileSingleTextNode(
 		returnFiber: FiberNode,
 		currentFiber: FiberNode | null,
@@ -43,6 +46,12 @@ function childReconciler(shouldTrackSideEffects: boolean) {
 		return fiber;
 	}
 
+	/**
+	 * 协调子节点
+	 * @param returnFiber returnFiber 就是 wip
+	 * @param currentFiber  currentFiber 是 hostRootFiber.child
+	 * @param newChild newChild 是 App 组件
+	 */
 	return function reconcileChildFibers(
 		returnFiber: FiberNode,
 		currentFiber: FiberNode | null,
@@ -53,6 +62,8 @@ function childReconciler(shouldTrackSideEffects: boolean) {
 			switch (newChild.$$typeof) {
 				case REACT_ELEMENT_TYPE:
 					return placeSingleChild(
+						// 用新element创建新fiber, return 执行父级fiber
+						// 返回子元素fiber对象
 						reconcileSingleElement(returnFiber, currentFiber, newChild)
 					);
 				default:
