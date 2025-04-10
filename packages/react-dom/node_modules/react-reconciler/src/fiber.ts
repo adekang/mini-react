@@ -23,6 +23,7 @@ export class FiberNode {
 	subtreeFlags: Flags;
 
 	updateQueue: unknown;
+	deletions: FiberNode[] | null; // 删除的子节点
 	/**
 	 *
 	 * @param tag 标签
@@ -63,6 +64,7 @@ export class FiberNode {
 		this.flags = NoFlags;
 		// / 表示子节点的副作用类型，如更新、插入、删除等
 		this.subtreeFlags = NoFlags;
+		this.deletions = null;
 	}
 }
 
@@ -108,6 +110,7 @@ export const createWorkInProgress = (
 		wip.pendingProps = pendingProps;
 		wip.flags = NoFlags;
 		wip.subtreeFlags = NoFlags;
+		wip.deletions = null;
 	}
 	wip.type = current.type;
 	wip.updateQueue = current.updateQueue; // 共用同一个 updateQueue对象

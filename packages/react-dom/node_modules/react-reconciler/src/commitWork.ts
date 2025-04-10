@@ -1,4 +1,9 @@
-import { appendChildToContainer, Container } from 'hostConfig';
+import {
+	appendChildToContainer,
+	commitUpdate,
+	Container,
+	removeChild
+} from 'hostConfig';
 import { FiberNode, FiberRootNode } from './fiber';
 import {
 	ChildDeletion,
@@ -7,8 +12,12 @@ import {
 	Placement,
 	Update
 } from './fiberFlags';
-import { HostComponent, HostRoot, HostText } from './workTags';
-import { createContainer } from './fiberReconciler';
+import {
+	FunctionComponent,
+	HostComponent,
+	HostRoot,
+	HostText
+} from './workTags';
 
 let nextEffect: FiberNode | null = null;
 export function commitMutationEffects(finishedWork: FiberNode) {
@@ -50,8 +59,18 @@ const commitMutationEffectsOnFiber = (finishedWork: FiberNode) => {
 		commitPlacement(finishedWork);
 		finishedWork.flags &= ~Placement; // 移除Placement标记
 	}
+	if ((flags & ChildDeletion) !== NoFlags) {
+		const deletions = finishedWork.deletions;
+		if (deletions !== null) {
+			deletions.forEach((childToDelete) => {
+				commitDeletion(childToDelete);
+			});
+		}
+		finishedWork.flags &= ~ChildDeletion;
+	}
 	if ((flags & Update) !== NoFlags) {
 		// TODO
+		commitUpdate(finishedWork);
 		finishedWork.flags &= ~Update;
 	}
 	if ((flags & ChildDeletion) !== NoFlags) {
@@ -107,5 +126,82 @@ function appendPlacementIntoContainer(
 			appendPlacementIntoContainer(sibling, hostParent);
 			sibling = sibling.sibling;
 		}
+	}
+}
+
+/**
+ * 删除需要考虑：
+ * HostComponent：需要遍历他的子树，为后续解绑ref创造条件，HostComponent本身只需删除最上层节点即可
+ * FunctionComponent：effect相关hook的执行，并遍历子树
+ */
+function commitDeletion(childToDelete: FiberNode) {
+	let rootHostNode: FiberNode;
+
+	// 递归子树
+	commitNestedComponent(childToDelete, (unmountFiber) => {
+		switch (unmountFiber.tag) {
+			case HostComponent:
+				if (rootHostNode === null) {
+					rootHostNode = unmountFiber;
+				}
+				// 解绑ref
+				return;
+			case HostText:
+				if (rootHostNode) {
+					rootHostNode = unmountFiber;
+				}
+				return;
+			case FunctionComponent:
+				// effect相关操作
+				return;
+
+			default:
+				if (__DEV__) {
+					console.warn('未支持的unmount类型', unmountFiber);
+				}
+				return;
+		}
+	});
+
+	// @ts-ignore
+	if (rootHostNode) {
+		const hostParent = getHostParent(childToDelete) as Container;
+		removeChild(rootHostNode.stateNode, hostParent);
+	}
+
+	childToDelete.return = null;
+	childToDelete.child = null;
+}
+
+function commitNestedComponent(
+	root: FiberNode,
+	onCommitUnmount: (fiber: FiberNode) => void
+) {
+	let node = root;
+
+	while (true) {
+		onCommitUnmount(node);
+
+		if (node.child !== null) {
+			// 向下
+			node.child.return = node;
+			node = node.child;
+			continue;
+		}
+		if (node === root) {
+			// 终止条件
+			return;
+		}
+		while (node.sibling === null) {
+			// 向上
+			if (node.return === null || node.return === root) {
+				// 终止条件
+				return;
+			}
+			// 归
+			node = node.return;
+		}
+		node.sibling.return = node.return;
+		node = node.sibling;
 	}
 }
