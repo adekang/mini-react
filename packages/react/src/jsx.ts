@@ -33,6 +33,15 @@ const ReactElement = (
 
 	return element;
 };
+
+export function isValidElement(element: any): boolean {
+	return (
+		element !== null &&
+		typeof element === 'object' &&
+		element.$$typeof === REACT_ELEMENT_TYPE
+	);
+}
+
 /**
  * jsx 函数
  * @param type 接受组件的type
