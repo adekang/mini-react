@@ -1,5 +1,8 @@
 import { Action } from 'shared/ReactTypes';
 
+/**
+ * 当前使用的hooks集合
+ */
 export interface Dispatcher {
 	useState: <T>(initialState: (() => T) | T) => [T, Dispatch<T>];
 }

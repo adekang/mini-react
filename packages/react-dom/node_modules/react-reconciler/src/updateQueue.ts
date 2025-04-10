@@ -1,6 +1,5 @@
 import { Action } from 'shared/ReactTypes';
-import { Container } from 'hostConfig';
-import { FiberNode } from './fiber';
+import { Dispatch } from 'react/src/currentDispatcher';
 
 export interface Update<State> {
 	// 接受setState 传的值 或者()=>{}函数
@@ -11,6 +10,7 @@ export interface UpdateQueue<State> {
 	shared: {
 		pending: Update<State> | null;
 	};
+	dispatch: Dispatch<State> | null;
 }
 
 /**
@@ -32,7 +32,8 @@ export const createUpdateQueue = <State>() => {
 	return {
 		shared: {
 			pending: null
-		}
+		},
+		dispatch: null
 	} as UpdateQueue<State>;
 };
 
