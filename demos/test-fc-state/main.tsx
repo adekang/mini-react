@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React,{useState} from 'react';
+import React, { useState } from 'react';
 import ReactDOM from 'react-dom/client';
 
 const App = () => {
 	const [num] = useState(0);
 
-	return <span>{num}</span>
+	return <span>{num}</span>;
 };
 
 const Child = () => {
@@ -23,4 +23,3 @@ const Child = () => {
 
 const root = document.getElementById('root');
 ReactDOM.createRoot(root).render(<App />);
-
