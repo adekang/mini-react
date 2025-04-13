@@ -11,7 +11,7 @@ import {
 } from './updateQueue';
 import { scheduleUpdateOnFiber } from './workLoop';
 
-let currentlyRenderingFiber: FiberNode | null = null;
+let currentlyRenderingFiber: FiberNode | null = null; // 当前正在渲染的fiber 也就是那个函数组件
 /**
  * 当前正在渲染的hook
  */
@@ -30,7 +30,7 @@ interface Hook {
 export function renderWithHooks(wip: FiberNode) {
 	// 赋值操作
 	currentlyRenderingFiber = wip;
-	wip.memoizedState = null; // 记忆的状态
+	wip.memoizedState = null; // 重置hooks的链表
 
 	const current = wip.alternate;
 	if (current !== null) {
