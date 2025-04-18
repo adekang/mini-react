@@ -5,7 +5,7 @@ import ReactDOM from 'react-dom/client';
 const App = () => {
 	const [num,setNum] = useState(0);
 	window.setNum = setNum;
-	return num === 3 ? <Child /> :<span>{num}</span>;
+	return num === 3 ? <Child /> :<span onClickCapture={() => setNum(num + 1)}>{num}</span>;
 };
 
 

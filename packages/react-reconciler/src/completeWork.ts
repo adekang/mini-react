@@ -4,6 +4,7 @@ import {
 	createInstance,
 	createTxtInstance
 } from 'hostConfig';
+import { updateFiberProps } from 'react-dom/src/SynctheticEvent';
 import { FiberNode } from './fiber';
 import { NoFlags, Update } from './fiberFlags';
 import {
@@ -32,6 +33,9 @@ export function completeWork(wip: FiberNode) {
 			// 无需处理
 			if (current !== null && wip.stateNode) {
 				// update
+				// 1 props 是否发生变化 {onClick: () => {}}  {onClick: () => {xxx}}
+				// 2 有变化 打 update flag、
+				updateFiberProps(wip.stateNode, newProps);
 			} else {
 				// mount
 				// 1.构建DOM;
