@@ -3,15 +3,18 @@ import React, { useState } from 'react';
 import ReactDOM from 'react-dom/client';
 
 const App = () => {
-	const [num,setNum] = useState(0);
-	window.setNum = setNum;
-	return num === 3 ? <Child /> :<span onClickCapture={() => setNum(num + 1)}>{num}</span>;
+	return (
+		<div onClick={() => { console.log('1'); }}>
+			<div onClick={() => { console.log('2'); }}>
+					<div onClick={() => { console.log('3'); }}>
+							<span>{11111}</span>
+					</div>
+		</div>
+	</div>
+	)
 };
 
 
-const Child = () => {
-	return <span>Child</span>;
-};
 
 const root = document.getElementById('root');
 ReactDOM.createRoot(root).render(<App />);
