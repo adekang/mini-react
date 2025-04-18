@@ -1,7 +1,14 @@
 import { Container } from 'hostConfig';
 import { Props } from 'shared/ReactTypes';
 
+/**
+ * 合成事件的标记
+ */
 export const elementPropsKey = '__props';
+
+/**
+ * 有效的事件类型
+ */
 const validEventType = ['click'];
 
 export interface DOMElement extends Element {
@@ -33,12 +40,19 @@ export function initEvent(container: Container, eventType: string) {
 	if (__DEV__) {
 		console.warn('初始化事件', eventType);
 	}
+
+	// 在 react 中 事件是绑定在 容器 根节点上的
 	container.addEventListener(eventType, (e: Event) => {
 		dispatchEvent(container, eventType, e);
 	});
 }
 
-function createSyntheticEvent(e: Event) {
+/**
+ * 创建合成事件
+ * @param e 原生事件
+ * @returns 合成事件
+ */
+function createSyntheticEvent(e: Event): SyntheticEvent {
 	const syntheticEvent = e as SyntheticEvent;
 	syntheticEvent.__stopPropagation = false;
 
@@ -75,6 +89,11 @@ function dispatchEvent(container: Container, eventType: string, e: Event) {
 	}
 }
 
+/**
+ * 触发事件流
+ * @param paths 事件数组
+ * @param se 合成事件
+ */
 function triggerEventFlow(paths: EventCallback[], se: SyntheticEvent) {
 	for (let i = 0; i < paths.length; i++) {
 		const callback = paths[i];
@@ -94,6 +113,13 @@ function getEventCallbackNameFromEventType(
 	}[eventType];
 }
 
+/**
+ *  收集事件路径
+ * @param targetElement 事件目标元素
+ * @param container 容器
+ * @param eventType 事件类型
+ * @returns
+ */
 function collectPaths(
 	targetElement: DOMElement,
 	container: Container,
